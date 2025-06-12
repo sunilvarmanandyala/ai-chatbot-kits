@@ -2,7 +2,7 @@
 import ChatWindow from '@/components/ChatWindow';
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from './api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/authOptions'; // Adjust the import path as necessary
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
