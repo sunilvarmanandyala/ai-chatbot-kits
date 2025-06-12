@@ -1,6 +1,6 @@
 // src/types/next-auth.d.ts
 
-import NextAuth, { DefaultSession, DefaultUser } from "next-auth";
+import { DefaultSession, DefaultUser } from "next-auth";
 
 // Augment the built-in Session and User types
 declare module "next-auth" {
@@ -9,7 +9,6 @@ declare module "next-auth" {
       id: string;
     };
   }
-
   interface User extends DefaultUser {
     id: string;
   }
