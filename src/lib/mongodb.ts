@@ -1,4 +1,7 @@
+
+console.log("🔍 MONGODB_URI at build/runtime:", process.env.MONGODB_URI);
 import { MongoClient } from 'mongodb';
+
 
 const uri = process.env.MONGODB_URI;
 let clientPromise: Promise<MongoClient>;
