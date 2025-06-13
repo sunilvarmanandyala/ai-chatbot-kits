@@ -5,7 +5,14 @@ import { event } from '@/lib/gtag';
 
 type Message = { role: string; text: string };
 
-export default function ChatWindow() {
+export default function ChatWindow( {
+  config,
+}: {
+  config?: {
+    webhookUrl?: string;
+    systemPrompt?: string;
+  };
+} ) {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'bot', text: 'Hi! How can I help you today?' },
   ]);
@@ -13,12 +20,14 @@ export default function ChatWindow() {
   const [loading, setLoading] = useState(false);
 
   // Settings from localStorage
-  const [webhookUrl, setWebhookUrl] = useState<string | null>(null);
-  const [systemPrompt, setSystemPrompt] = useState<string | null>(null);
+  const [webhookUrl, setWebhookUrl] = useState<string | null>(config?.webhookUrl ?? null);
+  const [systemPrompt, setSystemPrompt] = useState<string | null>(config?.systemPrompt ?? null);
 
   useEffect(() => {
+    if (!config) {
     setWebhookUrl(localStorage.getItem('webhookUrl'));
     setSystemPrompt(localStorage.getItem('systemPrompt'));
+    }
   }, []);
 
   const handleSend = async () => {
