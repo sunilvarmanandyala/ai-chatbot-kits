@@ -1,19 +1,9 @@
-// src/app/page.tsx
 import ChatWindow from '@/components/ChatWindow';
-import { redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/authOptions'; // Adjust the import path as necessary
 
-export default async function HomePage() {
-  const session = await getServerSession(authOptions);
-  if (!session) return redirect('/api/auth/signin');
-
+export default function Page() {
   return (
-    <div className="min-h-screen p-4 bg-gray-50">
-      <h1 className="text-2xl font-bold mb-4">
-        Welcome, {session.user.name || 'User'}!
-      </h1> 
+    <main className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <ChatWindow />
-    </div>
+    </main>
   );
 }

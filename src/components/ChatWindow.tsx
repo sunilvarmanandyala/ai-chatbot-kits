@@ -1,7 +1,6 @@
-// src/components/ChatWindow.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { event } from '@/lib/gtag';
 
 type Message = { role: string; text: string };
@@ -10,29 +9,22 @@ export default function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'bot', text: 'Hi! How can I help you today?' },
   ]);
-  const [input, setInput] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
 
+  // Settings from localStorage
   const [webhookUrl, setWebhookUrl] = useState<string | null>(null);
   const [systemPrompt, setSystemPrompt] = useState<string | null>(null);
 
-  // Load per-user settings from the API
   useEffect(() => {
-    fetch('/api/settings')
-      .then(res => res.json())
-      .then(data => {
-        setWebhookUrl(data.webhookUrl);
-        setSystemPrompt(data.systemPrompt);
-      })
-      .catch(() => {
-        // ignore fetch errors
-      });
+    setWebhookUrl(localStorage.getItem('webhookUrl'));
+    setSystemPrompt(localStorage.getItem('systemPrompt'));
   }, []);
 
-  const handleSend = async (): Promise<void> => {
+  const handleSend = async () => {
     if (!input.trim()) return;
 
-    // Fire a GA4 custom event
+    // Analytics event
     event({
       action: 'send_message',
       category: 'chat',
@@ -44,10 +36,10 @@ export default function ChatWindow() {
     const initialMessages: Message[] = systemPrompt
       ? [{ role: 'bot', text: systemPrompt }]
       : [];
-    const userMsg: Message = { role: 'user', text: input };
-    const updatedMessages = [...initialMessages, ...messages, userMsg];
+    const newMsg: Message = { role: 'user', text: input };
+    const updated = [...initialMessages, ...messages, newMsg];
 
-    setMessages(updatedMessages as Message[]);
+    setMessages(updated);
     setInput('');
     setLoading(true);
 
@@ -55,11 +47,17 @@ export default function ChatWindow() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: updatedMessages, webhookUrl }),
+        body: JSON.stringify({ messages: updated, webhookUrl }),
       });
-      const { reply } = await res.json();
-      setMessages(prev => [...prev, { role: 'bot', text: reply }]);
-    } catch {
+      const payload = await res.json();
+
+      if (!res.ok) {
+        throw new Error(payload.error || res.statusText);
+      }
+
+      setMessages(prev => [...prev, { role: 'bot', text: payload.reply }]);
+    } catch (e) {
+      console.error('Fetch error:', e);
       setMessages(prev => [
         ...prev,
         { role: 'bot', text: 'Sorry, something went wrong.' },
@@ -72,16 +70,16 @@ export default function ChatWindow() {
   return (
     <div className="max-w-md mx-auto p-4 border rounded-2xl shadow-lg bg-white flex flex-col">
       <div className="flex-1 h-80 overflow-y-auto space-y-2 mb-4">
-        {messages.map((m, idx) => (
+        {messages.map((msg, idx) => (
           <div
             key={idx}
             className={`p-2 rounded-lg text-sm ${
-              m.role === 'user'
+              msg.role === 'user'
                 ? 'bg-blue-100 self-end text-right'
                 : 'bg-gray-100'
             }`}
           >
-            {m.text}
+            {msg.text}
           </div>
         ))}
         {loading && (
