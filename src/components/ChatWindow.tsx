@@ -23,12 +23,13 @@ export default function ChatWindow( {
   const [webhookUrl, setWebhookUrl] = useState<string | null>(config?.webhookUrl ?? null);
   const [systemPrompt, setSystemPrompt] = useState<string | null>(config?.systemPrompt ?? null);
 
-  useEffect(() => {
-    if (!config) {
+useEffect(() => {
+  if (!config) {
     setWebhookUrl(localStorage.getItem('webhookUrl'));
     setSystemPrompt(localStorage.getItem('systemPrompt'));
-    }
-  }, []);
+  }
+}, [config]);
+
 
   const handleSend = async () => {
     if (!input.trim()) return;

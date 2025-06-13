@@ -1,7 +1,7 @@
-// src/app/demo/page.tsx
 'use client';
 
-import ChatWindow from "@/components/ChatWindow";
+import ChatWindow from '@/components/ChatWindow';
+import Script from 'next/script';
 
 export default function DemoEmbedPage() {
   return (
@@ -9,16 +9,18 @@ export default function DemoEmbedPage() {
       <h1 className="text-2xl font-bold">Widget Embed Demo</h1>
       <ChatWindow />
 
-      {/* Optionally create the container div */}
+
+      {/* Container for the widget */}
       <div id="demo-chat" />
 
-      {/* This script will load your widget and mount into #demo-chat */}
-      <script
+      {/* Use Next.js’s Script component */}
+      <Script
         src="/widget.js"
+        strategy="afterInteractive"
         data-container="demo-chat"
         data-webhook="https://hooks.zapier.com/hooks/catch/XXX/YYY/"
         data-prompt="You are a friendly assistant that helps with support questions."
-      ></script>
+      />
     </main>
   );
 }
